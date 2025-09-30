@@ -107,10 +107,7 @@ def run(
         #### Sync the simulation ###################################
         if gui:
             sync(i, START, env.CTRL_TIMESTEP)
-
-    #### Close the environment #################################
-    env.close()
-
+            
     #### Save the simulation results ###########################
     logger.save()
     logger.save_as_csv("dw") # Optional CSV save
@@ -119,6 +116,8 @@ def run(
     if plot:
         logger.plot()
 
+    #### Close the environment #################################
+    env.close()
 
 if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##

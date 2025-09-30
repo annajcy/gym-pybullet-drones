@@ -112,17 +112,17 @@ def run(
         if gui:
             pass
             sync(i, START, env.CTRL_TIMESTEP)
-
-    #### Close the environment #################################
-    env.close()
-
+            
     #### Save the simulation results ###########################
     logger.save()
-    logger.save_as_csv("beta") # Optional CSV save
+    logger.save_as_csv("cf") # Optional CSV save
 
     #### Plot the simulation results ###########################
     if plot:
         logger.plot()
+
+    #### Close the environment #################################
+    env.close()
 
 if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##

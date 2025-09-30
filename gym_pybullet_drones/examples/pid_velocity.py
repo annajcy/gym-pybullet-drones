@@ -145,14 +145,14 @@ def run(
         #### Sync the simulation ###################################
         if gui:
             sync(i, START, env.CTRL_TIMESTEP)
-
-    #### Close the environment #################################
-    env.close()
-
+            
     #### Plot the simulation results ###########################
     logger.save_as_csv("vel") # Optional CSV save
     if plot:
         logger.plot()
+
+    #### Close the environment #################################
+    env.close()
 
 if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##

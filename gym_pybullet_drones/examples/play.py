@@ -1,6 +1,7 @@
 import os
 import time
 import argparse
+from venv import logger
 import numpy as np
 import gymnasium as gym
 from stable_baselines3 import PPO
@@ -74,8 +75,8 @@ def play(model_path=DEFAULT_MODEL_PATH, multiagent=DEFAULT_MA, gui=DEFAULT_GUI):
         if terminated:
             break
 
-    env.close()
     logger.plot()
+    env.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run a trained PPO policy in PyBullet drones environment.")

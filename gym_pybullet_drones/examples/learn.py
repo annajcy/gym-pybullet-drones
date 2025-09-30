@@ -183,10 +183,11 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         sync(i, start, test_env.CTRL_TIMESTEP)
         if terminated:
             obs = test_env.reset(seed=42, options={})
-    test_env.close()
-
+            
     if plot and DEFAULT_OBS == ObservationType.KIN:
-        logger.plot()
+        logger.plot()     
+            
+    test_env.close()
 
 if __name__ == '__main__':
     #### Define and parse (optional) arguments for the script ##
