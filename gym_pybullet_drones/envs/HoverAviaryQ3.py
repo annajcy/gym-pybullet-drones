@@ -28,7 +28,7 @@ class HoverAviaryQ3(BaseRLAviary):
         self.TARGET_POS = np.array([0.0, 0.5, 0.8], dtype=np.float32)
         self.EPISODE_LEN_SEC = 8
         self.SUCCESS_DIST = 0.10          # 成功距离阈值（m）
-        self.SUCCESS_STREAK_N = 5        # 连续命中步数
+        self.SUCCESS_STREAK_N = 15        # 连续命中步数
         self._success_streak = 0
 
         super().__init__(drone_model=drone_model,
@@ -47,27 +47,11 @@ class HoverAviaryQ3(BaseRLAviary):
     # ---------------- Reward / Done / Trunc / Info ---------------- #
 
     def _computeReward(self):
-        """
-        密奖励：
-        - 距离：2 - ||e||^2   （e=pos-目标）  —> 距离 0 时给 2/步
-        - 速度：-0.1 * ||v||^2
-        - 倾角：-0.05 * (roll^2 + pitch^2)
-        - 控制偏差：-1e-6 * ||rpm - hover||^2  （轻微约束）
-        """
         s = self._getDroneStateVector(0)
         pos = s[0:3]
-        roll, pitch = s[7], s[8]
-        vel = s[10:13]
-        last_rpm = s[16:20]
-
         dist = np.linalg.norm(self.TARGET_POS - pos)
-        r_dist = 2.0 - (dist ** 2)
-        r_vel = -0.1 * float(np.dot(vel, vel))
-        r_tilt = -0.05 * float(roll ** 2 + pitch ** 2)
-        # 偏离悬停转速的轻惩罚（last_rpm 单位是 RPM）
-        r_ctrl = -1e-6 * float(np.dot(last_rpm - self.HOVER_RPM, last_rpm - self.HOVER_RPM))
-
-        return float(r_dist + r_vel + r_tilt + r_ctrl)
+        ret = max(0, 2 - dist**4)
+        return ret
 
     def _computeTerminated(self):
         """

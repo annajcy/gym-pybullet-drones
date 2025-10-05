@@ -80,12 +80,13 @@ def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=D
                                  eval_freq=int(1000),
                                  deterministic=True,
                                  render=False)
+
     model.learn(total_timesteps=int(1e7) if local else int(1e2), # shorter training in GitHub Actions pytest
                 callback=eval_callback,
                 log_interval=100)
 
     #### Save the model ########################################
-    model.save(filename+'/final_model_q3.zip')
+    model.save(filename+'/final_model.zip')
     print(filename)
 
     #### Print training progression ############################
@@ -104,8 +105,8 @@ def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=D
 
     # if os.path.isfile(filename+'/final_model.zip'):
     #     path = filename+'/final_model.zip'
-    if os.path.isfile(filename+'/best_model_q3.zip'):
-        path = filename+'/best_model_q3.zip'
+    if os.path.isfile(filename+'/best_model.zip'):
+        path = filename+'/best_model.zip'
     else:
         print("[ERROR]: no model under the specified path", filename)
     model = PPO.load(path) # type: ignore

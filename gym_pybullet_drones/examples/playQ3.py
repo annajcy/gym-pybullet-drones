@@ -11,7 +11,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 from gym_pybullet_drones.utils.utils import sync
 from gym_pybullet_drones.utils.Logger import Logger
 
-DEFAULT_MODEL_PATH = '/root/gym-pybullet-drones/results/save-q3-10.05.2025_13.44.21/best_model.zip'
+DEFAULT_MODEL_PATH = '/root/gym-pybullet-drones/gym_pybullet_drones/examples/results/save-q3-10.05.2025_14.27.18/best_model.zip'
 DEFAULT_GUI = False
 DEFAULT_OBS = ObservationType('kin')
 # DEFAULT_ACT = ActionType('one_d_rpm')
@@ -45,17 +45,15 @@ def play(model_path=DEFAULT_MODEL_PATH, gui=DEFAULT_GUI):
 
         obs2 = obs.squeeze()
         act2 = action.squeeze()
-
-        if DEFAULT_OBS == ObservationType.KIN:
-            logger.log(drone=0,
-                timestamp=i/env.CTRL_FREQ,
-                state=np.hstack([obs2[0:3],
-                                    np.zeros(4),
-                                    obs2[3:15],
-                                    act2]),
-                control=np.zeros(12))
+        state_vec = env._getDroneStateVector(0)
+    
+        logger.log(
+            drone=0,
+            timestamp=i/env.CTRL_FREQ,
+            state=state_vec,
+            control=np.zeros(12)
+        )
            
-
         env.render()
         sync(i, start, env.CTRL_TIMESTEP)
         if terminated:
