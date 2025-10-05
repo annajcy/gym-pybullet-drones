@@ -29,15 +29,13 @@ from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewar
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from gym_pybullet_drones.utils.Logger import Logger
-from gym_pybullet_drones.envs.HoverAviary import HoverAviary
-from gym_pybullet_drones.envs.MultiHoverAviary import MultiHoverAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
 from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 # DEFAULT_GUI = False
-DEFAULT_GUI = False
+DEFAULT_GUI = True
 # DEFAULT_RECORD_VIDEO = False
-DEFAULT_RECORD_VIDEO = True
+DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = True
 
@@ -69,7 +67,7 @@ def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=D
                 verbose=1)
 
     #### Target cumulative rewards (problem-dependent) ##########
-    target_reward = 400.0
+    target_reward = 460.0
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=target_reward,
                                                      verbose=1)
     eval_callback = EvalCallback(eval_env,
@@ -94,11 +92,7 @@ def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=D
         for j in range(data['timesteps'].shape[0]):
             print(str(data['timesteps'][j])+","+str(data['results'][j][0]))
 
-    ############################################################
-    ############################################################
-    ############################################################
-    ############################################################
-    ############################################################
+    #### Evaluate the model ####################################
 
     if local:
         input("Press Enter to continue...")

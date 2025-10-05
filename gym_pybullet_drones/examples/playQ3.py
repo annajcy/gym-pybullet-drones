@@ -2,7 +2,6 @@ import os
 import time
 import argparse
 from tkinter.font import families
-from venv import logger
 import numpy as np
 import gymnasium as gym
 from stable_baselines3 import PPO
@@ -11,8 +10,8 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 from gym_pybullet_drones.utils.utils import sync
 from gym_pybullet_drones.utils.Logger import Logger
 
-DEFAULT_MODEL_PATH = '/root/gym-pybullet-drones/gym_pybullet_drones/examples/results/save-q3-10.05.2025_14.27.18/best_model.zip'
-DEFAULT_GUI = False
+DEFAULT_MODEL_PATH = '/Users/jinceyang/Desktop/codebase/nuscourse/nus_ceg_homework/ceg5306/pa3/gym-pybullet-drones/results/save-q3-10.05.2025_18.48.18/best_model.zip'
+DEFAULT_GUI = True
 DEFAULT_OBS = ObservationType('kin')
 # DEFAULT_ACT = ActionType('one_d_rpm')
 DEFAULT_ACT = ActionType('rpm')
@@ -27,13 +26,12 @@ def play(model_path=DEFAULT_MODEL_PATH, gui=DEFAULT_GUI):
     print(f"[INFO] Loaded model from {model_path}")
 
 
-    env = HoverAviaryQ3(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, record=True)
+    env = HoverAviaryQ3(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, record=False)
     
 
     logger = Logger(logging_freq_hz=int(env.CTRL_FREQ),
                     num_drones=1,
-                    output_folder="logs_playback/",
-                    colab=True)
+                    colab=False)
 
     #### Run the simulation ####
     obs, _ = env.reset(seed=42, options={})
