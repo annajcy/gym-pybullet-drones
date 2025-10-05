@@ -60,44 +60,16 @@ class HoverAviaryQ3(BaseRLAviary):
                          obs=obs,
                          act=act
                          )
-
-    ################################################################################
-    
+        self.last_action = np.zeros(4)
+        self.action = np.zeros(4)
+        self.is_first_step = True
+        
     def _preprocessAction(self,
                           action
                           ):
-        """Pre-processes the action passed to `.step()` into motors' RPMs.
-
-        Parameter `action` is processed differenly for each of the different
-        action types: the input to n-th drone, `action[n]` can be of length
-        1, 3, or 4, and represent RPMs, desired thrust and torques, or the next
-        target position to reach using PID control.
-
-        Parameter `action` is processed differenly for each of the different
-        action types: `action` can be of length 1, 3, or 4 and represent 
-        RPMs, desired thrust and torques, the next target position to reach 
-        using PID control, a desired velocity vector, etc.
-
-        Parameters
-        ----------
-        action : ndarray
-            The input action for each drone, to be translated into RPMs.
-
-        Returns
-        -------
-        ndarray
-            (NUM_DRONES, 4)-shaped array of ints containing to clipped RPMs
-            commanded to the 4 motors of each drone.
-
-        """
-        self.action_buffer.append(action)
-        SCALE = 0.03
-        rpm = np.zeros((self.NUM_DRONES,4))
-        for k in range(action.shape[0]):
-            target = action[k, :]
-            rpm[k,:] = np.array(self.HOVER_RPM * (1 + SCALE*target))
-
-        return rpm
+        ret = super()._preprocessAction(action)
+        self.action = action
+        return ret
 
     ################################################################################
     
@@ -114,19 +86,30 @@ class HoverAviaryQ3(BaseRLAviary):
         pos = s[0:3]
         rot = s[7:9]
         vel = s[10:13]
+   
         err = self.TARGET_POS - pos
+        
         weight_err = np.array([
-            err[0],        # X error
-            err[1],        # Y error
-            err[2] * 1.1   # Z error with 1.1x weight!
+            err[0] * 1.15,  # X error
+            err[1] * 1.05,        # Y error
+            err[2] * 1.25   # Z error with 1.25x weight!
         ])
         
         weighted_dist = np.linalg.norm(weight_err)
         r = max(0, 2 - weighted_dist**4)
         velocity_penalty = np.linalg.norm(vel)
-        r -= 0.1 * velocity_penalty
+        r -= 0.5 * velocity_penalty
+        r -= 0.1 * np.linalg.norm(err[2])
         orientation_penalty = np.linalg.norm(rot) # Penalize only roll and pitch
-        r -= 0.1 * orientation_penalty
+        r -= 0.2 * orientation_penalty
+        if self.is_first_step:
+            self.is_first_step = False
+            self.last_action = self.action
+        action_smoothness_penalty = np.linalg.norm(self.action - self.last_action)
+        self.last_action = self.action
+        r -= 0.1 * action_smoothness_penalty
+        if np.linalg.norm(err) < 0.02:
+            r += 0.5  # Bonus for being very close to the target
         return r
 
     ################################################################################

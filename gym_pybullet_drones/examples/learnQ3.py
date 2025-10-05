@@ -67,7 +67,8 @@ def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=D
                 verbose=1)
 
     #### Target cumulative rewards (problem-dependent) ##########
-    target_reward = 460.0
+    # target_reward = 460.0
+    target_reward = 430.0
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=target_reward,
                                                      verbose=1)
     eval_callback = EvalCallback(eval_env,
