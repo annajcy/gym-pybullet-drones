@@ -6,8 +6,7 @@ Example
 -------
 In a terminal, run as:
 
-    $ python learn.py --multiagent false
-    $ python learn.py --multiagent true
+    $ python learn.py
 
 Notes
 -----
@@ -19,7 +18,8 @@ import os
 import time
 from datetime import datetime
 import argparse
-from gym_pybullet_drones.envs import HoverAviary, HoverAviaryQ3
+from gym_pybullet_drones.envs import HoverAviaryQ3
+from stable_baselines3.common.monitor import Monitor
 import gymnasium as gym
 import numpy as np
 import torch
@@ -39,17 +39,15 @@ DEFAULT_GUI = False
 # DEFAULT_RECORD_VIDEO = False
 DEFAULT_RECORD_VIDEO = True
 DEFAULT_OUTPUT_FOLDER = 'results'
-DEFAULT_COLAB = False
+DEFAULT_COLAB = True
 
 DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
 # DEFAULT_ACT = ActionType('one_d_rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
-DEFAULT_AGENTS = 2
-DEFAULT_MA = False
 
-def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
+def run(output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=True, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
 
-    filename = os.path.join(output_folder, 'save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
+    filename = os.path.join(output_folder, 'save-q3-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
     if not os.path.exists(filename):
         os.makedirs(filename+'/')
 
@@ -58,7 +56,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                                 n_envs=1,
                                 seed=0
                                 )
-    eval_env = HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    eval_env = Monitor(HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT))
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
@@ -71,10 +69,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 verbose=1)
 
     #### Target cumulative rewards (problem-dependent) ##########
-    if DEFAULT_ACT == ActionType.ONE_D_RPM:
-        target_reward = 474.15 if not multiagent else 949.5
-    else:
-        target_reward = 467. if not multiagent else 920.
+    target_reward = 400.0
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=target_reward,
                                                      verbose=1)
     eval_callback = EvalCallback(eval_env,
@@ -120,10 +115,10 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                             obs=DEFAULT_OBS,
                             act=DEFAULT_ACT,
                             record=record_video)
-    test_env_nogui = HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    test_env_nogui = Monitor(HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT))
     
     logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
-                num_drones=DEFAULT_AGENTS if multiagent else 1,
+                num_drones=1,
                 output_folder=output_folder,
                 colab=colab
                 )
@@ -145,32 +140,21 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         act2 = action.squeeze()
         print("Obs:", obs, "\tAction", action, "\tReward:", reward, "\tTerminated:", terminated, "\tTruncated:", truncated)
         if DEFAULT_OBS == ObservationType.KIN:
-            if not multiagent:
-                logger.log(drone=0,
-                    timestamp=i/test_env.CTRL_FREQ,
-                    state=np.hstack([obs2[0:3],
-                                        np.zeros(4),
-                                        obs2[3:15],
-                                        act2
-                                        ]),
-                    control=np.zeros(12)
-                    )
-            else:
-                for d in range(DEFAULT_AGENTS):
-                    logger.log(drone=d,
-                        timestamp=i/test_env.CTRL_FREQ,
-                        state=np.hstack([obs2[d][0:3],
-                                            np.zeros(4),
-                                            obs2[d][3:15],
-                                            act2[d]
-                                            ]),
-                        control=np.zeros(12)
-                        )
+            logger.log(drone=0,
+                timestamp=i/test_env.CTRL_FREQ,
+                state=np.hstack([obs2[0:3],
+                                    np.zeros(4),
+                                    obs2[3:15],
+                                    act2
+                                    ]),
+                control=np.zeros(12)
+                )
+            
         test_env.render()
-        print(terminated)
+        print("terminated" if terminated else "not terminated", "truncated" if truncated else "not truncated")
         sync(i, start, test_env.CTRL_TIMESTEP)
-        if terminated:
-            obs = test_env.reset(seed=42, options={})
+        if terminated or truncated:
+            obs, info = test_env.reset(seed=42, options={})
             
     if plot and DEFAULT_OBS == ObservationType.KIN:
         logger.plot()     
@@ -180,7 +164,6 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
 if __name__ == '__main__':
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning example script')
-    parser.add_argument('--multiagent',         default=DEFAULT_MA,            type=str2bool,      help='Whether to use example LeaderFollower instead of Hover (default: False)', metavar='')
     parser.add_argument('--gui',                default=DEFAULT_GUI,           type=str2bool,      help='Whether to use PyBullet GUI (default: True)', metavar='')
     parser.add_argument('--record_video',       default=DEFAULT_RECORD_VIDEO,  type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')

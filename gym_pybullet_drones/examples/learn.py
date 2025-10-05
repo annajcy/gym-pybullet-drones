@@ -38,7 +38,7 @@ DEFAULT_GUI = False
 # DEFAULT_RECORD_VIDEO = False
 DEFAULT_RECORD_VIDEO = True
 DEFAULT_OUTPUT_FOLDER = 'results'
-DEFAULT_COLAB = False
+DEFAULT_COLAB = True
 
 DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
 # DEFAULT_ACT = ActionType('one_d_rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
