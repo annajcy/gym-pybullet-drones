@@ -19,6 +19,7 @@ import os
 import time
 from datetime import datetime
 import argparse
+from gym_pybullet_drones.envs import HoverAviary, HoverAviaryQ3
 import gymnasium as gym
 import numpy as np
 import torch
@@ -33,7 +34,7 @@ from gym_pybullet_drones.envs.MultiHoverAviary import MultiHoverAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
 from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
-# DEFAULT_GUI = True
+# DEFAULT_GUI = False
 DEFAULT_GUI = False
 # DEFAULT_RECORD_VIDEO = False
 DEFAULT_RECORD_VIDEO = True
@@ -52,20 +53,12 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if not os.path.exists(filename):
         os.makedirs(filename+'/')
 
-    if not multiagent:
-        train_env = make_vec_env(HoverAviary,
-                                 env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
-                                 seed=0
-                                 )
-        eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        train_env = make_vec_env(MultiHoverAviary,
-                                 env_kwargs=dict(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
-                                 seed=0
-                                 )
-        eval_env = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    train_env = make_vec_env(HoverAviaryQ3,
+                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
+                                n_envs=1,
+                                seed=0
+                                )
+    eval_env = HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT)
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
@@ -97,7 +90,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 log_interval=100)
 
     #### Save the model ########################################
-    model.save(filename+'/final_model.zip')
+    model.save(filename+'/final_model_q3.zip')
     print(filename)
 
     #### Print training progression ############################
@@ -116,26 +109,19 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
 
     # if os.path.isfile(filename+'/final_model.zip'):
     #     path = filename+'/final_model.zip'
-    if os.path.isfile(filename+'/best_model.zip'):
-        path = filename+'/best_model.zip'
+    if os.path.isfile(filename+'/best_model_q3.zip'):
+        path = filename+'/best_model_q3.zip'
     else:
         print("[ERROR]: no model under the specified path", filename)
     model = PPO.load(path) # type: ignore
 
-    #### Show (and record a video of) the model's performance ##
-    if not multiagent:
-        test_env = HoverAviary(gui=gui,
-                               obs=DEFAULT_OBS,
-                               act=DEFAULT_ACT,
-                               record=record_video)
-        test_env_nogui = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        test_env = MultiHoverAviary(gui=gui,
-                                        num_drones=DEFAULT_AGENTS,
-                                        obs=DEFAULT_OBS,
-                                        act=DEFAULT_ACT,
-                                        record=record_video)
-        test_env_nogui = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+
+    test_env = HoverAviaryQ3(gui=gui,
+                            obs=DEFAULT_OBS,
+                            act=DEFAULT_ACT,
+                            record=record_video)
+    test_env_nogui = HoverAviaryQ3(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    
     logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
                 num_drones=DEFAULT_AGENTS if multiagent else 1,
                 output_folder=output_folder,

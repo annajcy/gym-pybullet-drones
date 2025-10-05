@@ -1,6 +1,7 @@
 import os
 import time
 import argparse
+from tkinter.font import families
 from venv import logger
 import numpy as np
 import gymnasium as gym
@@ -12,8 +13,8 @@ from gym_pybullet_drones.utils.utils import sync
 from gym_pybullet_drones.utils.Logger import Logger
 
 # DEFAULT_MODEL_PATH = "results/best_model.zip"
-DEFAULT_MODEL_PATH = '/home/annaj/codebase/nus_ceg_homework/ceg5306/pa3/gym-pybullet-drones/results/save-09.28.2025_21.33.14/best_model.zip'
-DEFAULT_GUI = True
+DEFAULT_MODEL_PATH = '/root/gym-pybullet-drones/results/save-10.05.2025_12.20.19/best_model.zip'
+DEFAULT_GUI = False
 DEFAULT_OBS = ObservationType('kin')
 # DEFAULT_ACT = ActionType('one_d_rpm')
 DEFAULT_ACT = ActionType('rpm')
@@ -38,7 +39,7 @@ def play(model_path=DEFAULT_MODEL_PATH, multiagent=DEFAULT_MA, gui=DEFAULT_GUI):
     logger = Logger(logging_freq_hz=int(env.CTRL_FREQ),
                     num_drones=DEFAULT_AGENTS if multiagent else 1,
                     output_folder="logs_playback/",
-                    colab=False)
+                    colab=True)
 
     #### Run the simulation ####
     obs, _ = env.reset(seed=42, options={})
