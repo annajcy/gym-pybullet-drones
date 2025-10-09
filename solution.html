@@ -7482,7 +7482,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Q1">Q1<a class="anchor-link" href="#Q1">¶</a></h1><h3 id="Demo">Demo<a class="anchor-link" href="#Demo">¶</a></h3><p><img alt="" src="media/task3.gif"/></p>
+<h1 id="Q1">Q1<a class="anchor-link" href="#Q1">¶</a></h1><h3 id="Demo">Demo<a class="anchor-link" href="#Demo">¶</a></h3><p><a href="https://github.com/annajcy/gym-pybullet-drones/blob/main/media/task1.gif">Link</a></p>
+<p><img alt="" src="media/task1.gif"/></p>
 <h1 id="Q2">Q2<a class="anchor-link" href="#Q2">¶</a></h1><h3 id="File-Locations">File Locations<a class="anchor-link" href="#File-Locations">¶</a></h3><p>For observation state refer to: 
 <code>def _observationSpace(self)</code> in <code>gym-pybullet-drones/gym_pybullet_drones/envs/BaseRLAviary.py</code></p>
 <p>For action state refer to:
@@ -7527,7 +7528,8 @@ $$\text{RPM}_i = \text{HOVER\_RPM} \times (1 + 0.05 \times a_i)$$</p>
 <li><strong>Moderate distance</strong> (distance $= 1.0$): $r_t = 2 - (1.0)^4 = 2 - 1 = 1.0$</li>
 <li><strong>Far from target</strong> (distance $= 1.2$): $r_t = \max(0, 2 - (1.2)^4) = \max(0, 2 - 2.07) = 0$</li>
 </ul>
-<h1 id="Q3">Q3<a class="anchor-link" href="#Q3">¶</a></h1><h3 id="Demo">Demo<a class="anchor-link" href="#Demo">¶</a></h3><p><img alt="" src="media/task3.gif"/></p>
+<h1 id="Q3">Q3<a class="anchor-link" href="#Q3">¶</a></h1><h3 id="Demo">Demo<a class="anchor-link" href="#Demo">¶</a></h3><p><a href="https://github.com/annajcy/gym-pybullet-drones/blob/main/media/task3.gif">Link</a></p>
+<p><img alt="" src="media/task3.gif"/></p>
 <h3 id="Code-Changes">Code Changes<a class="anchor-link" href="#Code-Changes">¶</a></h3><h4 id="PPO-training-loop.">PPO training loop.<a class="anchor-link" href="#PPO-training-loop.">¶</a></h4><p><code>learnQ3.py</code> builds a single-env PPO agent, evaluates every 1 000 steps, and uses <code>StopTrainingOnRewardThreshold(430)</code> to capture the best checkpoint for later playback, reward_threshold is set to 430 to ensure the model trains sufficiently well before stopping.</p>
 <div class="highlight"><pre><span></span><span class="n">train_env</span> <span class="o">=</span> <span class="n">make_vec_env</span><span class="p">(</span><span class="n">HoverAviaryQ3</span><span class="p">,</span> <span class="n">env_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">obs</span><span class="o">=</span><span class="n">DEFAULT_OBS</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">DEFAULT_ACT</span><span class="p">),</span> <span class="n">n_envs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">PPO</span><span class="p">(</span><span class="s1">'MlpPolicy'</span><span class="p">,</span> <span class="n">train_env</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -7641,6 +7643,16 @@ $$R_t = \underbrace{\max(0, 2 - ||\mathbf{W} \cdot \vec{e}_p||_2^4)}_{\text{Posi
 <p>The attitude (roll and pitch) remains level throughout the stable phase, which is crucial for hovering. Most notably, the motor RPM commands are smooth, showing far less oscillation than in previous iterations. This is a direct result of the action smoothness penalty in the reward function, leading to a more efficient and stable control strategy.</p>
 <h4 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">¶</a></h4><p>The final model successfully overcame previous challenges like altitude overshoot and control signal oscillation. It demonstrates a robust, efficient, and precise solution to the hovering task, achieving high stability with smooth control inputs.</p>
 <h1 id="Code">Code<a class="anchor-link" href="#Code">¶</a></h1><p>The code is available at: <a href="https://github.com/annajcy/gym-pybullet-drones">https://github.com/annajcy/gym-pybullet-drones</a>, forked from <a href="https://github.com/NUS-HcRL/gym-pybullet-drones">https://github.com/NUS-HcRL/gym-pybullet-drones</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4ce4f38c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 </div>
 </div>
 </div>
