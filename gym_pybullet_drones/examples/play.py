@@ -1,10 +1,7 @@
 import os
 import time
 import argparse
-from tkinter.font import families
-from venv import logger
 import numpy as np
-import gymnasium as gym
 from stable_baselines3 import PPO
 from gym_pybullet_drones.envs.HoverAviary import HoverAviary
 from gym_pybullet_drones.envs.MultiHoverAviary import MultiHoverAviary
@@ -12,9 +9,8 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 from gym_pybullet_drones.utils.utils import sync
 from gym_pybullet_drones.utils.Logger import Logger
 
-# DEFAULT_MODEL_PATH = "results/best_model.zip"
-DEFAULT_MODEL_PATH = '/root/gym-pybullet-drones/results/save-10.05.2025_12.20.19/best_model.zip'
-DEFAULT_GUI = False
+DEFAULT_MODEL_PATH = '/Users/jinceyang/Desktop/codebase/nuscourse/nus_ceg_homework/ceg5306/pa3/gym-pybullet-drones/results/task1/best_model.zip'
+DEFAULT_GUI = True
 DEFAULT_OBS = ObservationType('kin')
 # DEFAULT_ACT = ActionType('one_d_rpm')
 DEFAULT_ACT = ActionType('rpm')
@@ -32,14 +28,14 @@ def play(model_path=DEFAULT_MODEL_PATH, multiagent=DEFAULT_MA, gui=DEFAULT_GUI):
 
     #### Create test environment ####
     if not multiagent:
-        env = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+        env = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, record=True)
     else:
         env = MultiHoverAviary(gui=gui, num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
 
     logger = Logger(logging_freq_hz=int(env.CTRL_FREQ),
                     num_drones=DEFAULT_AGENTS if multiagent else 1,
                     output_folder="logs_playback/",
-                    colab=True)
+                    colab=False)
 
     #### Run the simulation ####
     obs, _ = env.reset(seed=42, options={})
